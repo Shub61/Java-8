@@ -1,2 +1,47 @@
 What is Functinal Interface && How you create one.
+	@FunctionalInterfaceAnnotation is used to create one FI.
+	In FI, we cannot have more than one ABSTRACT Method.
+	We have have more than one default && statc method in FI.
+
 How you can restict an Interface as an Functional Interface.
+	This ishow we can restrict the normal interface as a FI.
+
+Some existing common FI
+	Runnable, Comparator
+
+****
+Interface Don't extend Object Class Still, Object's Public Method are visible.
+interface TestInterface{
+
+}
+public class ConfusedDemoRelatedToInterface {
+    public static void main(String[] args) {
+        TestInterface testInterface = null;
+        testInterface.equals(null); // Visible
+        testInterface.hashCode(); // Visible
+
+        // Interface Don't extend Object Class Still, Object's Public Method are visible
+    }
+}
+
+It leads to very imp point related to FunctionalInterface.
+Comparator Interface is FI, though it has 2 ABSTRACT methods.
+	1. compare(Object o1, Object o2);
+	2. boolean eqauls(Object o);
+Then Why we call it FI. ?
+	This is the standard Java Language Specification which states like this,
+
+	“If an interface has no direct super interfaces, then the interface implicitly declares a public abstract member method m with signature s, return type r, and 		throws clause t corresponding to each public instance method m with signature s, return type r, and throws clause t declared in Object, unless a method with 		the same signature, same return type, and a compatible throws clause is explicitly declared by the interface.”
+	That's how Object class' methods are declared in an interface. And according to JLS, this does not count as interface' abstract method. Hence, Comparator interface is a functional interface.
+
+Comparable Interface has one ABSTRACT method, then we don't call it as FI ?
+
+	Ans 1 ->
+		The issue comes from a subtle difference between a "method" and a "function".
+		The output value of a function depends ONLY on the arguments that are input to that function.
+		However the output of a method depends on the arguments that are input to the function but it may also depend on the object's state (instance variables).
+		That is, any function is a method but not all methods are functions.
+		For example, the method compare in the interface Comparator depends only on its arguments. However, the method compareTo in the interface Comparable depends 		on the state of the object to compare to, so it needs to be implemented in a class.
+		So even Comparable has one abstarct method, semantically it shouldn't be considered as a functional interface.
+	
+
