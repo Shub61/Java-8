@@ -1,3 +1,10 @@
+#############
+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
+#############
+
+Java 8 Main Features :
+	Functional Interface/ lambda expression/ Stream/ Default Method in Interface/ Optional / StringJoiner / Date / Concurrency-(CompletableFuture)
+
 What is Functinal Interface && How you create one.
 	@FunctionalInterfaceAnnotation is used to create one FI.
 	In FI, we cannot have more than one ABSTRACT Method.
@@ -7,7 +14,7 @@ How you can restict an Interface as an Functional Interface.
 	This ishow we can restrict the normal interface as a FI.
 
 Some existing common FI
-	Runnable, Comparator
+	Runnable, Comparator, Consumer, Predicate, Supplier, UnaryOperator
 
 ****
 Interface Don't extend Object Class Still, Object's Public Method are visible.
@@ -43,5 +50,108 @@ Comparable Interface has one ABSTRACT method, then we don't call it as FI ?
 		That is, any function is a method but not all methods are functions.
 		For example, the method compare in the interface Comparator depends only on its arguments. However, the method compareTo in the interface Comparable depends 		on the state of the object to compare to, so it needs to be implemented in a class.
 		So even Comparable has one abstarct method, semantically it shouldn't be considered as a functional interface.
+
+Why default method in Java Interface ?
+	Mainly because of Backward Compatibilty.Stream introduction has many methods in collection:to support the existing Collection Interface, java folks have added this feature.
+	Another point is : suppose we have one interface I one method A(); We have 4 classes A, B, C , D implements I.
+			   Now , we want another method B() in I , then all classes have to implement this B().
+			   This becomes very tedioud taks and to overcome this we have default B() {};
+
+Default methods Diamond Problem in java 8?
+This problem happens when 2 nterfaces have same default method and class has to implemement both Interfaces. Which interface method is inherited in the Class.
+
+
+	To solve this java-8 has InterFaceName.super.Method(). 
+
+
+	package func_interface;
+
+	interface RBCBank{
+	    boolean depositMoneyToRBC(int amt);
+	    default void printAmount(){
+		System.out.println("PRINT from RBC");
+	    }
+	    void checkAmount();
+	}
+
+	interface CIBCBank{
+	    boolean depositMoneyToCIBC(int amt);
+	    default void printAmount(){
+		System.out.println("PRINT from CIBC");
+	    }
+	    void checkAmount();
+	}
+	public class DefaultMethodDiamondProblem implements RBCBank, CIBCBank{
+	    @Override
+	    public boolean depositMoneyToRBC(int amt) {
+		return false;
+	    }
+
+	    @Override
+	    public void printAmount() {
+		RBCBank.super.printAmount();
+	    }
+
+	    @Override
+	    public boolean depositMoneyToCIBC(int amt) {
+		return false;
+	    }
+
+	    @Override
+	    public void checkAmount(){
+		System.out.println("Yes Amount is present");
+	    }
+
+	    public static void main(String[] args) {
+		DefaultMethodDiamondProblem defaultMethodDiamondProblem = new DefaultMethodDiamondProblem();
+		defaultMethodDiamondProblem.printAmount();
+	    }
+	}
+
+
+What is Lambda Expression ?
+	Basically it's a functionality that u can pass in any Method.
+	A block of code which u can pass or play with.
+	Also  can say as Anonymus Inner Class.
+
+Variables Scope in Lambda ?
+	All the LOCAL variables in Method which is also local to Lambda &&  INSTANCE/STATIC variables from CLASS can be accessed by the Lambda.
+
+Local variables must be FINAL or EFFICTIVELY FINAL in JAVA Lambda.
+	Good Explanaition https://stackoverflow.com/questions/67065119/why-dont-instance-fields-need-to-be-final-or-effectively-final-to-be-used-in-la (Kirk Woll)
+	Basic Idea, Local variables are ON STACK PER THREAD and supoosed to be Destroyed as method  finishes.
+		So Java honours this and DOES'nt allow modifiation
+
+
+Optional Class in Java 8 ?
+	Final Class to handle null values.
+One Liner Null check with Optional
+	String s = null;
+	Optional.ofNullable(s).orElse("Default")
+Mainly 3 Static Methods:
+	Optional.ofNullable()/empty()/of("HI")
+
+
+Filter/Map/FlatMap ?
+	Map --> Transform one object to Other by applying a function
+	FlatMap --> Flatten a Stream of Collection to Stream of Objects
+	Stream<List<List<String>> --> flatMap() --> Stream<String>
+
+Stream --> IntStream.range()/rangeClosed()
+
+Create FINITE stream ?
+	Stream.of(T... values)/.of(array)
+	Arrays.stream(arr);
+	
+Create INFINITE STREAM ?
+	Stream.iterate() --> Stateful always followed by .limit(maxSize) // takeWhile(predicate) --> To break
+	Stream.generate(supplier) --> Stateful always followed by .limit(maxSize)
+
+	
+	
+
+			   
+	
+
 	
 
