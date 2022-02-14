@@ -1,0 +1,60 @@
+Qs1:ArrayList && LinkedList Difference
+        ArrayList are like Arrays but Dynamic : Read is Fast
+        LinkedList are based on Linked List Data Structure. Insertion/Deletion is Fast
+
+Qs2:HashMap, SynchronizedMap, ConcurrentHashMap
+        HaspMap --> Not ThreadSafe , Allow Null Key / Null Values
+        SynchronizedMap --> ThreadSafe but Slower --> It takes Lock on entire collection
+                    Hence even read/write becomes very slow
+        **** Iterator of SynchronizedXXX are not Thread-Safe && we have to use EXPLICIT
+             Synchronized block to read. *****
+
+        ConcurrentHashMap is Thread Safe / Fast --> it lock at segment level so multiple threads
+                can work together at a time. Read Operation are NOT locked at all.
+
+        Use ConcurrentHashMap when Performance is considered more on Consistency
+        Use SynchronizedMap when DATA Consistency is the TOP Priority
+
+Qs3:Fail-Fast Collections Means(ConcurrentModificationExceptionDemo.java)
+        It throws ConcurrentModificationException as something unexpected happens.
+        Collections are fail-fast. So one thread cannot update while other one is reading.
+        Non thread-safe collections do this by keeping a variable called modCount.
+            This variable is responsible of keeping track of modifications done to that object.
+            If modCount is somehow increased during an operation,
+                ConcurrentModificationException is thrown to inform you.
+
+        Note: Vector and Hashtable are ThreadSafe
+
+Qs4:Concurrent Collections
+        Group1:: Copy-on-write Collections --> CopyOnWriteArrayList and CopyOnWriteArraySet.
+        This kind of thread-safe collections stores values in an immutable array;
+        any change to the value of the collection results in a new array being created
+            to reflect the new values.
+        Used where READ is HIGH than WRITE
+
+        Group2:: Compare-And-Swap Collections --> ConcurrentLinkedQueue and ConcurrentSkipListMap.
+        Uses Compare & Swap Algo. To update it uses a LOCAL COPY  and does its calculation.
+        Then compare the value with Start value ->
+            If Same:: UPDATE WITH NEW Calculated
+            If NOT Same:: Then the CAS thread can try the whole computation again using the new value,
+                            or give up, or continue.
+        It has Weakly Consistent Iterator. Some values can be updated.
+        NO ConcurrentModificationException
+
+        Group3:: Concurrent Collections --> ConcurrentHashMap and LinkedBlockingQueue. && More
+        It uses a special lock object (java.util.concurrent.lock.Lock).
+        Lock can be obtained at different Segments which makes it Faster.
+        It has Weakly Consistent Iterator & NO ConcurrentModificationException
+
+Qs5:WeakHashMap
+        Keys are eagerly GC collected.
+        Used in CACHE where Keys can be cleared if it's not used and values are HIGH Memory Consuming Objects.
+
+
+
+
+
+
+
+
+
