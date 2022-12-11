@@ -1,0 +1,15 @@
+What is IP Phone : The phone connected to literally INTERNET,
+            It wll have an I address to connect to outside world.
+VOIP means : Voice over Internet Protocol
+
+Main Components: Cisco Webex Teams Messaging/ (One to One/Group) file/image/video sharing
+                 Cisco Webex Meetings/Content Sharing/WhiteBoarding
+                    Advance Feature record meetings, provide personal space.
+                 Callings
+                 Cisco Webex Hybrid Directory Service
+                 Cisco Webex Hybrid Calendar Service
+                 Cisco Webex Video Mesh
+                 Cisco Webex Hybrid Call Service
+
+                 Media is encrypted with Secure Real-time Transport Protocol (SRTP)
+                    between Cisco Webex and Cisco Expressway

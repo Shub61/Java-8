@@ -1,5 +1,6 @@
 import java.sql.SQLOutput;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.*;
 
@@ -9,7 +10,35 @@ import java.util.stream.*;
  * //https://javahungry.blogspot.com/2020/05/java-8-coding-and-programming-interview-questions.html
  */
 public class Java8StreamCodingQs {
-
+    private static Map<Character, Integer> charMap = new HashMap<Character, Integer>();
+    static {
+        charMap.put('a', 1);
+        charMap.put('b', 2);
+        charMap.put('c', 3);
+        charMap. put('d', 4);
+        charMap.put('e', 5);
+        charMap.put('f', 6);
+        charMap.put('g', 7);
+        charMap.put('h', 8);
+        charMap.put('i', 9);
+        charMap.put('j', 10);
+        charMap.put('k', 11);
+        charMap.put('l', 12);
+        charMap.put('m', 13);
+        charMap.put('n', 14);
+        charMap.put('o', 15);
+        charMap.put('p', 16);
+        charMap.put('q', 17);
+        charMap.put('r', 18);
+        charMap.put('s', 19);
+        charMap.put('t', 20);
+        charMap.put('u', 21);
+        charMap.put('v', 22);
+        charMap.put('w', 23);
+        charMap.put('x', 24);
+        charMap.put('y', 25);
+        charMap.put('z', 26);
+    }
     public static boolean isPrime(int nbr) {
         if (nbr == 1 || nbr == 2) return true;
         return IntStream.range(2, nbr).noneMatch(n -> nbr % n == 0);
@@ -18,7 +47,6 @@ public class Java8StreamCodingQs {
     /**
      * Now, starting again from a list of names,
      * give me the total number of letters in all the names with more than 5 letters
-     *
      *  System.out.println("Testing if [william, jones, aaron, seppe, frank, gilliam] returns 14")
      */
     public static int countTotalLetter(List<String> stringList) {
@@ -164,7 +192,7 @@ public class Java8StreamCodingQs {
     }
 
     /**
-     * print Yougest Male Employee Departmentwise
+     * print Separate Male Employee Department wise
      */
     public static void separateEmployeesByAge(List<Employee> employeeList) {
         employeeList.stream()
@@ -213,11 +241,41 @@ public class Java8StreamCodingQs {
     }
 
     /**
+     * Find Max with Reduce
+     */
+
+    public static void findMax(List<Integer> integerList){
+        Integer maxItem = integerList.stream()
+                .reduce((a, b) -> a > b? a : b)
+                .get();
+        System.out.println(maxItem);
+
+        // Another Approach is to Add items in SET and negate.
+    }
+
+    /**
+     * Find Max with Reduce
+     */
+
+    public static void findMaxEvenLengthWord(String str){
+        String maxEvenLengthWord = Arrays.asList(str.split(" ")).stream()
+                .filter(w -> w.length() % 2 == 0)
+                .reduce((a, b) -> a.length() > b.length() ? a : b)
+                .get();
+        System.out.println(maxEvenLengthWord);
+
+        // Another Approach is to Add items in SET and negate.
+    }
+
+
+    /**
      * find the first non-repeated character
      */
 
     public static void firstNonRepeatedCharacter(String str){
-        Character firstNonRepeatedCharacter = str.chars().mapToObj(i-> (char) i)
+        char [] chars = str.toCharArray();
+        Character firstNonRepeatedCharacter = IntStream.range(0, chars.length)
+                .mapToObj(i-> (char) i)
                 .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new, Collectors.counting()))
                 .entrySet().stream()
                 .filter(entry-> entry.getValue() == 1)
@@ -230,16 +288,53 @@ public class Java8StreamCodingQs {
      */
 
     public static void firstRepeatedCharacter(String str){
-        Character firstNonRepeatedCharacter = str.chars().mapToObj(i-> (char) i)
+        char [] chars = str.toCharArray();
+        Character firstNonRepeatedCharacter = IntStream.range(0, chars.length)
+                .mapToObj(i-> (char) i)
                 .collect(Collectors.groupingBy(Function.identity(), LinkedHashMap::new, Collectors.counting()))
                 .entrySet().stream()
                 .filter(entry-> entry.getValue() > 1)
                 .findFirst().get().getKey();
         System.out.println("First Repeated Character:: " + firstNonRepeatedCharacter);
     }
+    /**
+     * sum Of Digits Of Given String
+     */
+
+    public static void sumOfDigitsOfGivenString(String str){
+        char [] chars = str.toCharArray();
+        char [] intChar = IntStream.range(0, chars.length)
+                .mapToObj(idx-> charMap.get(chars[idx]))
+                .map(String::valueOf)
+                .collect(Collectors.joining())
+                .toCharArray();
+       Integer sumNew =  IntStream.range(0, intChar.length)
+                .mapToObj(idx -> intChar[idx])
+                .map(Character::getNumericValue)
+                .collect(Collectors.summingInt(Integer::intValue));
+
+         Integer sum = str.chars()
+            .mapToObj(i-> String.valueOf(charMap.get((char) i)))
+                 .collect(Collectors.joining())
+                 .chars()
+                 .mapToObj(i-> (char) i)
+                 .map(String::valueOf)
+                 .map(Integer::parseInt)
+                 .collect(Collectors.summingInt(Integer::intValue));
+//                    .collect(Collectors.summingInt(Integer::intValue));
+        System.out.println("Sum of All digits:: " + sum);
+        System.out.println("Sum of All digits:: " + sumNew);
+    }
+
+    public static void multipleOfFive(List<Integer> list){
+        list.stream()
+                .map(i-> i * 5).
+                collect(Collectors.toList())
+                .forEach(System.out::println);
+
+    }
 
     public static void main(String args[]) {
-
 //        System.out.println(isPrime(7));
 //        int count = countTotalLetter(Arrays.asList("william", "jones", "aaron", "seppe", "frank", "gilliam"));
 //        System.out.println(count);
@@ -273,8 +368,25 @@ public class Java8StreamCodingQs {
 //        findAllNumbersStartingWith1(Arrays.asList(10,15,8,49,25,98,32));
 //        findDuplicates(Arrays.asList(10,15,8,49,25,98,98,32,15));
 //          firstNonRepeatedCharacter("Java Hungry Blog Alive is Awesome");
-        firstRepeatedCharacter("Java Hungry Blog Alive is Awesome");
-
+//        firstRepeatedCharacter("Java Hungry Blog Alive is Awesome");
+//        sumOfDigitsOfGivenString("zbax");
+//        multipleOfFive(Arrays.asList(10,15,8,49,25,98,98,32,15));
+//        findMax(Arrays.asList(10,15,8,49,25,98,98,32,15));
+//        findMaxEvenLengthWord("Java Hungry Blog Alive is Awesome");
+        String [] logs = new String [] {"10.00.00.00 200 google.com", "10.00.00.00 200 yahoo.com", "10.00.00.00 200 google.com"};
+        List<String> tempList = new ArrayList<>();
+                Arrays.asList(logs)
+        .stream()
+        .filter(i-> i.split(" ")[1].equals("200"))
+        .map(i-> i.split(" ")[2])
+        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+        .entrySet()
+        .stream()
+        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+        .collect(Collectors.toList())
+                        .forEach(i-> tempList.add(i.getKey()));
+        String [] ansArray = tempList.stream().toArray(String[]::new);
+        System.out.println(ansArray);
     }
 }
 

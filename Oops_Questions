@@ -1,0 +1,6 @@
+Q1 : Abstractions Vs Encapsulation
+        Abstraction: Show what is necessary
+                     Happens as design time
+        Encapsulation:  Happens at Execution phase
+                        Other way is Encapsulation Implements Abstraction
+

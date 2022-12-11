@@ -1,0 +1,189 @@
+Qs1:Comparable && Comparator
+        Comparable used for sorting object in natural Order.
+        Whereas Comparator is used for any Order.
+
+CONTRACT of EQUALS && COMPARE
+        Comparable or Comparator BOTH compareTo() && compare() MUST be in CONSISTENT with equals().
+        Exception- BigDecimal equals () -- 4.0 && 4.00 --> FALSE
+                              compareTO() -- 4.0 && 4.00 --> TRUE
+
+        https://www.codejava.net/java-core/collections/understanding-object-ordering-in-java-with-comparable-and-comparator
+        https://docs.oracle.com/javase/8/docs/api/java/lang/Comparable.html
+
+Comparable and Equals && Hashcode contract.
+        A very good point is  If you don't override HashCode
+        Then u will be able to add duplicate objects in Set
+        Bcoz HashSet, HashMap, ArrayList  checks FIRST HashCode to compare and Then Equals.
+        But TreeMap, TreeSet uses CompareTo to check equalities. bcoz they are ordered.
+
+Qs Scenario based: U have a HasSet and u have overridden Equals && HasCode.Everything looks fine.
+                    Now u need ordering also and u changed HasSet to TreeSet
+                    Things started breaking. Why ?
+             So, the point we need to do the same logic for compareTo/Equals.
+             Bcoz HashSet, HashMap, ArrayList  checks FIRST HashCode to compare and Then Equals.
+                    But TreeMap, TreeSet uses CompareTo to check equalities. bcoz they are ordered.
+
+Qs2:How you can clean/close resources other than finally block ?
+        TRY WITH RESOURCES :::: No NEED OF CATCH/FINALLY
+            try with resources (java1.7) used as an alternate as try-catch-finally.
+        It will make sure that the resources will be closed WITHOUT FINALLY.
+        You can still use try-catch  with resources way. --> try() {} catch {}
+        CUSTOM resource has to Implement AutoClosable interface.
+        ORDER is :first Acquire will be closed as LAST. (TryResourceDemo.java)
+
+        https://www.baeldung.com/java-try-with-resources
+
+Qs3: Overriding Rules:
+        default access : we cannot override, if parent & child are in different package.
+        default access : can override, if it's in same package.
+        Can not have More Restrictive Access Modifier in Child Class
+        ********** The overriding method must not throw new or broader checked exceptions.
+
+        The protected access modifier is accessible within package and outside the package but through inheritance only.
+        The protected access modifier can be applied on the data member, method and constructor.
+        It can't be applied on the class.
+
+Qs4: Does finally block always executes? (FinallyBlockDemo.java)
+        finally block always executes even with the return statement in try/catch.
+        Only System.exit() / System Crash it will not execute.
+        return value in finally will override the try/catch Value.
+
+Qs6:    How to create an Object in java? Explain Different ways to do it ?
+            Using new keyword  -->      Object obj = new Object();
+            Using new instance -->      Class.forName().newInstance()
+            Using clone() method  -->   Object obj.clone()
+            Using deserialization -->   ObjectInputStream oos.readObject();
+            Using newInstance() method of Constructor class  -->
+                                            Constructor<GFG> constructor
+                                                = GFG.class.getDeclaredConstructor();
+                                            GFG r = constructor.newInstance();
+
+Qs7:    How to create immutable map in java on which we can’t modify after adding the data ?
+            If we use Collections.unmodifiableMap(mutableMap); --> We can still change the underlying MAP
+            1: ImmutableMap.copyOf(mutableMap) -->
+            2: ImmutableMap.<String, String>builder().putAll(mutableMap)
+                 .put("Costa Rica", "North America")
+                 .build();
+            3: ImmutableMap.of("USA", "North America", "Costa Rica", "North America");
+
+Qs8: Order of execution of StaticBlock/InitBlocks/Constructor IN INHERITANCE or NORMAL
+        Base Static
+        Child Static
+        Main Method (bcoz of static)
+        Base Init
+        Base Constructor
+        Child Init
+        Child Constructor
+
+Qs9:  Questions related to static synchronization in java?
+        The complete declarations of  methods are:
+            method1: public static synchronized void method1()
+            method2: public static synchronized void method2()
+            method3: public static void method3()
+            method4: public synchronized int method4()
+            method5: public String method5()
+            method6: public synchronized int method6()
+
+            t1.method1() starts execution as it attains class level lock of Manager class.
+            t2.method1() wait for its time to start execution, as it is a static synchronized method,
+            it requires a class level lock,
+                as t1 has already acquired class level lock t2 must wait until t1 execution.
+            t3.method2() waits as it requires class level lock, so it must wait until t1 releases the lock.
+            t4.method3() starts execution as it is static methods requires no lock
+            t5.method4() starts execution as it is instance or(normal) level synchronized method and
+                requires object level lock, so it attains object level lock.
+            t6.method5() starts execution as it is an instance method or a normal method
+            t7.method6() wait for its time to start execution, as it is a synchronized method,
+                          and t5 has already acquired the lock.
+
+
+            Remember that a static synchronized method and a non-static synchronized method
+            will not block each other- they can run at same time as both method have different locks.
+
+Read more: https://javarevisited.blogspot.com/2012/06/10-interview-questions-on-java-generics.html#ixzz7HY1gYlGy
+
+
+
+Qs10:  If in a class test (String s)  && test (Integer i)
+    and we Call with test(null) ---> Compile Error bcoz of ambiguity.
+
+Qs11 : Difference between Association , Aggregation vs composition ?
+        Association is a relation b/w entities (1 to 1, 1 to m, m to 1, m to m)
+        Aggregation is a relation b/w entities.
+            But Both can be created Independently and lived independently.
+            A would be the Owner of B. NOT VICE VERSA.
+        Composition is the Strict.
+            A would be the Owner of B. And Controls the CREATION/ Destroy of the B .
+
+Q12. Exception Handling in Parent Child
+        If an overridden method does not throw an exception using throws clause then
+            The overriding method can not throw any checked or compile-time exception.
+            The overriding method can throw any unchecked or runtime exception.
+
+2. How Generics works in Java ? What is type erasure ?
+Explain Throw throws throwable ?
+How to create Thread Pool and how to use it in database Connection pool
+What is the life cycle of thread and in Thread Pool?
+How to create Create custom class loader in java?
+
+
+Qs:  Garbage Collector:
+    Minor Collections -> mainly variable in loop/methods
+        Young generation ->Die Young
+    Major Collections:
+        Old Generation -> if survive multiple times in Young generation
+            OR big objects moved to this space
+
+    Mark Copy Algo:  Young Generation Space
+        Young generation Space is divided into
+                Eden Space,--> New Objects are here
+                && Survive 1 & 2
+
+        Steps :
+            Eden Space,--> New Objects are here
+            Once it's full run Minor GC
+            Mark all live objects in Eden
+            Copy it over to S1
+            Reclaim Eden is Empty
+
+            Again Eden is full,
+                    Run Minor GC
+                    Copy from Eden to S2
+                    Eden Space,--> New Objects are here
+                    Reclaim Eden and S1 as empty
+
+    Mark Sweep Compact Algo:  Old Generation Space
+        Keep filling the space
+        once threshold triggered, run GC
+        Mark only Live
+        Sweep all dead objects
+        Then run Compactions means(Compress all live to Left)
+
+    Now Real GC Algo's
+        1: Serial Collector -> Use single thread for minor and major both.
+                                Use compaction technique to allocate objets
+                                Best for small memory and shared CPU
+        2: Parallel Collector ->
+                                For minor multiple threads may use all cores
+                                for major one Thread only.
+
+            a. Parallel OLD Collector ->
+                                For minor and major multiple threads may use all cores
+                                Better with Batch applications
+                                It stops the Application on all cores
+
+        3: CMS collector -> Concurrent Mark and Sweep
+                            Parallel for Young Generation Space.
+                            Concurrent with Old Gen Space
+                            less throughput than parallel
+                            Less pause time.
+                            Best for general app.
+
+        4: G1 Collector : Garbage First Collector (Improvement over CMS)
+                        It uses entire heap and itself assigns as Young or Old Space.
+                        Great for applications which needs predictable latency.
+                            by using Max Pause time My app can handle.
+
+        5: Shenondoah : Improvement over G1
+
+

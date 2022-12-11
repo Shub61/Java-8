@@ -1,0 +1,123 @@
+https://www.youtube.com/watch?v=-jeoyDJDsSM&t=1601s
+1: What is Angular : A binding Framework to bind View to Model.
+                     usually, it M(Model) V(View) VM (View Model) --> M V VM
+
+2: Differentiate between AngularJS vs Angular ?
+               AngularJS (1.x) :  Angular (2 Onwards)
+Language       JavaScript      : TypeScript
+Architecture   Controller      : Component
+LazyLoad       No      : Yes
+
+3: What are directives in Angular ?
+        Helps to attach Behaviour in HTML DOM.
+        Angular Syntax's written Inside HTML.
+
+4: Explain the different types of Angular directives ?
+        3 Types:
+            Structural : Change the Structure of DOM element by adding/removing elements.
+                    *ngIf, *ngFor : bcoz based on these Elements may be more and less.
+            Attribute  :  It will always be in DOM, but based on behavior
+                            It can be Hidden/Visible ; Highlighter. [hidden]
+            Component  :  It's a Directive with Template. User Control.
+                            basically (View + Logic)
+
+
+5: Explain the importance of NPM and Node_Modules folder ?
+        NPM is a package manger to install any Java Script Framework.
+        node_modules is a folder where all packages Installs.
+
+6: Explain the importance of Package.json file in Angular ?
+        All the packages which project uses will be listed down to this file.
+
+7 :- What is typescript and why do we need it ?
+        It Adds the Type to Java Script. U can get Compile  Time Error
+        Also, it provides OOPS. in easy way.
+
+8 :- Explain importance of Angular CLI ?
+        Help to give you ready made Angular project to Start with.
+            Like SpringInitializer for SpringBoot.
+
+9 :- Explain the importance of Component and Modules ?
+        Component:  In this write Code which bind b/w View & Model. So basically central point.
+        Modules:  It Groups the Angular Component.
+
+10 :- What is a decorator OR ANNOTATIONS OR METADATA in Angular ?
+        Tells what Exactly what Type of this Class
+
+Variations of this qs:
+        Create the Module/Component.
+            Use @Component /@NgModule
+
+12 :- What is a template ?
+        It is the View HTML.
+            2 ways U can define :
+                Inline :- In ur component provide the template:  <USE HTML CODE>
+                Outside:  In ur component provide the templateURL :  <USE PATH to HTML>
+
+12 :- What is Data Binding
+        How the View and Component Talk to each Other is Binding.
+
+13 :- Explain the four types of Data bindings in Angular ?
+        1: Expression/Interpolation binding -> {{}}   (Data flows from Controller to View)
+        2: Property binding  ->  [] = some variable   (Data flows from Controller to View)
+        3: Event binding  ->  (click)   (Data flows from View to Controller)
+        3: Two Way binding  ->  [(ngModel)]   (Data flows from View to Controller and Vice Versa)
+
+14 :- Explain architecture of Angular ?
+        1 View/Template Talks to Controller/Component
+        2: Controller/Component
+        3: Modules (Group of Components)
+        4: Bindings For View b/w Components
+        5: Directives
+        6: Service (Some Common Functionality)
+            Services are INJECTED in Components. using Dependency Injection
+
+15 :- What is SPA in Angular ?
+        Single Page Application
+            where common parts are loaded once
+                and then depending on user events dynamic sections are loaded from server.
+
+16 :- How to implement SPA in Angular ?
+        Using Routing
+17 :- How to implement routing in Angular ?
+        Helps you to navigate for ur App
+            Home: will navigate to HomeComponent and that will invoke view.
+        Step 1: Use a collection where all navigation are stored.
+        Step 2: In Html define <[routerLink] = "Home"> Home </a>
+        Step 3: In Html have one <router-outlet></router-outlet>
+
+18 :- Explain Lazy Loading ?
+19 :- How to implement Lazy Loading in Angular ?
+        Step 1: Divide the App into Modules
+        Step 2: Use loadChildren in Routing Collection
+
+22:- How to implement Dependency Injection ? (Services are used)
+        use providers property from NgModules Annotations
+
+23 :- Differentiate between ng Serve and ng build ?
+        ng serve : build in ONLY in Memory
+        ng build : build like PROD, store in disk  under dist folder
+
+26 :- Explain ViewChild and ViewChildren?
+        To refer View element in Component use ViewChild('div1', MORE...)
+        To refer View collections (which are present in view via single variable)
+
+27 :- Why do we need Template reference variables?
+        To paas the View Element value or element itself to Component as a Method Argument.
+        We create this <input #myinput type ="text>
+        https://www.youtube.com/watch?v=Oo0-r_YhoJs
+
+28 :- Angular LifeCycle
+        2 Steps:
+            One time Event Chains
+                Constructor ->
+                      ngOnChanges ->
+                      ngOnInit ->
+                      ngDoCheck ->
+                            ngAfterContentInit ->
+                            ngAfterContentChecked ->
+                            ngAfterViewInit ->
+                            ngAfterViewChecked->
+                      ngOnDestroy
+            Every change Events
+

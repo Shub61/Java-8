@@ -1,0 +1,13 @@
+Aws :
+    We create a function (Even SmallPiece of Micro service) like -> GetSecPrice,
+                            Calculate Volatility, generateFile
+
+        We store it AWS Storage
+        Then a request comes for that function ->
+                AWS check the config, gets the function and load it AWS COMPUTE
+                    At this point the function is actually be running as an instance.
+                One function is done AWS will destroy the function
+
+        Another Good use case is Our Scheduler , we hav file gerneation based on Spring BOOT Scheduler
+            Here this service runs 24/7
+            Rather this Config it it AWS Lambda and let AWS handle it.

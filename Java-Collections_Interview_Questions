@@ -3,7 +3,7 @@ Qs1:ArrayList && LinkedList Difference
         LinkedList are based on Linked List Data Structure. Insertion/Deletion is Fast
 
 Qs2:HashMap, SynchronizedMap, ConcurrentHashMap
-        HaspMap --> Not ThreadSafe , Allow Null Key / Null Values
+        HashMap --> Not ThreadSafe , Allow Null Key / Null Values
         SynchronizedMap --> ThreadSafe but Slower --> It takes Lock on entire collection
                     Hence even read/write becomes very slow
         **** Iterator of SynchronizedXXX are not Thread-Safe && we have to use EXPLICIT
@@ -48,7 +48,8 @@ Qs4:Concurrent Collections
 
 Qs5:WeakHashMap
         Keys are eagerly GC collected.
-        Used in CACHE where Keys can be cleared if it's not used and values are HIGH Memory Consuming Objects.
+        Used in CACHE where Keys can be cleared if it's not used
+            and values are HIGH Memory Consuming Objects.
 
 
 

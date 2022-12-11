@@ -3,21 +3,56 @@ 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
 #############
 
 Java 8 Main Features :
-	Functional Interface/ lambda expression/ Stream/ Default Method in Interface/ Optional / StringJoiner / Date / Concurrency-(CompletableFuture)
+	Functional Interface/ lambda expression/ Stream/ Default Method in Interface/
+	Optional / StringJoiner / Date / Concurrency-(CompletableFuture), NO PermGen
 
-What is Functinal Interface && How you create one.
-	@FunctionalInterfaceAnnotation is used to create one FI.
+	Another feature is Inside JVM there are 2 compilers c1 & c2 and till Java 7 we had option to choose..
+	Java 8 both c1 && c2 wil be used by default.
+
+    These compiler are different from javac as they work on BYTE CODE to perform more optimization at runtime.
+    They use internal cache (inside JVM) of 240MB.
+
+    What Kind of Optimization:
+        Dead Code, Loops, Null Check Elimination,
+        Escape Analysis -> if any objects are created in a method and they were never returned,
+                So, this optimization move these to Stack Rather than Heap to make GC faster.
+        This Entire Profiling , performance optimization , Oracle's VM is called HOTSPOT
+        C1 & c2 don't Stop the App to be running , so core count is very imp.
+
+        These all things work at run time so from Java 9 ....AHEAD OF TIME
+            compilation is done for some part of code
+
+        jaotc --output X.so Hollowed.java
+        java --XX:AOTLibrary=./X.so Helloworld
+
+        One Problem However, this AOT library is Platform Dependent and only be supported JVM X86.
+
+
+What are the new change in java memory model in java 8?
+    Gone are the days of OutOfMemory Errors due to PermGen space.
+    With Java 8, there is NO PermGen. That’s right.
+    So no more OutOfMemory Errors due to PermGen
+
+    PermGen : was part of Heap
+    Metaspace : part of Native Memory (process memory)
+        DownSide : We can bring down entire server if we consume more memory.
+                So, It is critical that you add the new option -XX:MaxMetaspaceSize
+                        which sets the Maximum Metaspace size for your application.
+
+What is Functional Interface && How you create one.
+	@FunctionalInterface Annotation is used to create one FI.
 	In FI, we cannot have more than one ABSTRACT Method.
-	We have have more than one default && statc method in FI.
+	We can have more than one default && static method in FI.
 
-How you can restict an Interface as an Functional Interface.
-	This ishow we can restrict the normal interface as a FI.
+How you can restrict an Interface as an Functional Interface.
+	This is how we can restrict the normal interface as a FI.
 
 Some existing common FI
 	Runnable, Comparator, Consumer, Predicate, Supplier, UnaryOperator
 
 ****
 Interface Don't extend Object Class Still, Object's Public Method are visible.
+
 interface TestInterface{
 
 }
@@ -26,44 +61,55 @@ public class ConfusedDemoRelatedToInterface {
         TestInterface testInterface = null;
         testInterface.equals(null); // Visible
         testInterface.hashCode(); // Visible
-
-        // Interface Don't extend Object Class Still, Object's Public Method are visible
     }
 }
 
 It leads to very imp point related to FunctionalInterface.
 Comparator Interface is FI, though it has 2 ABSTRACT methods.
 	1. compare(Object o1, Object o2);
-	2. boolean eqauls(Object o);
+	2. boolean equals(Object o);
 Then Why we call it FI. ?
 	This is the standard Java Language Specification which states like this,
 
-	“If an interface has no direct super interfaces, then the interface implicitly declares a public abstract member method m with signature s, return type r, and 		throws clause t corresponding to each public instance method m with signature s, return type r, and throws clause t declared in Object, unless a method with 		the same signature, same return type, and a compatible throws clause is explicitly declared by the interface.”
-	That's how Object class' methods are declared in an interface. And according to JLS, this does not count as interface' abstract method. Hence, Comparator interface is a functional interface.
+	“If an interface has no direct super interfaces,
+	then the interface implicitly declares a public abstract member method m with signature s,
+	return type r, and throws clause t corresponding to each public instance method m with signature s,
+	return type r, and throws clause t declared in Object, unless a method with
+	the same signature, same return type, and a compatible throws clause is explicitly declared
+	by the interface.”
+	That's how Object class' methods are declared in an interface.
+	And according to JLS, this does not count as interface' abstract method.
+	Hence, Comparator interface is a functional interface.
 
 Comparable Interface has one ABSTRACT method, then we don't call it as FI ?
 
 	Ans 1 ->
 		The issue comes from a subtle difference between a "method" and a "function".
 		The output value of a function depends ONLY on the arguments that are input to that function.
-		However the output of a method depends on the arguments that are input to the function but it may also depend on the object's state (instance variables).
+		However the output of a method depends on the arguments that are input to the function
+		but it may also depend on the object's state (instance variables).
 		That is, any function is a method but not all methods are functions.
-		For example, the method compare in the interface Comparator depends only on its arguments. However, the method compareTo in the interface Comparable depends 		on the state of the object to compare to, so it needs to be implemented in a class.
-		So even Comparable has one abstarct method, semantically it shouldn't be considered as a functional interface.
+		For example, the method compare in the interface Comparator depends only on its arguments.
+		However, the method compareTo in the interface Comparable depends
+		on the state of the object to compare to, so it needs to be implemented in a class.
+		So even Comparable has one abstract method,
+		semantically it shouldn't be considered as a functional interface.
 
 Why default method in Java Interface ?
-	Mainly because of Backward Compatibilty.Stream introduction has many methods in collection:to support the existing Collection Interface, java folks have added this feature.
-	Another point is : suppose we have one interface I one method A(); We have 4 classes A, B, C , D implements I.
+	Mainly because of Backward Compatibility.
+	Stream introduction has many methods in collection:to support the existing Collection Interface,
+	java folks have added this feature.
+
+	Another point is : suppose we have one interface I one method A();
+	                We have 4 classes A, B, C , D implements I.
 			   Now , we want another method B() in I , then all classes have to implement this B().
-			   This becomes very tedioud taks and to overcome this we have default B() {};
+			   This becomes very tedious tasks and to overcome this we have default B() {};
 
 Default methods Diamond Problem in java 8?
-This problem happens when 2 nterfaces have same default method and class has to implemement both Interfaces. Which interface method is inherited in the Class.
+    This problem happens when 2 interfaces have same default method and class has to implement
+    both Interfaces. Which interface method is inherited in the Class.
 
-
-	To solve this java-8 has InterFaceName.super.Method(). 
-
-
+	To solve this java-8 has InterFaceName.super.Method().
 	package func_interface;
 
 	interface RBCBank{
@@ -112,15 +158,16 @@ This problem happens when 2 nterfaces have same default method and class has to 
 What is Lambda Expression ?
 	Basically it's a functionality that u can pass in any Method.
 	A block of code which u can pass or play with.
-	Also  can say as Anonymus Inner Class.
+	Also  can say as Anonymous Inner Class.
 
 Variables Scope in Lambda ?
-	All the LOCAL variables in Method which is also local to Lambda &&  INSTANCE/STATIC variables from CLASS can be accessed by the Lambda.
+	All the LOCAL variables in Method which is also local to Lambda &&
+	INSTANCE/STATIC variables from CLASS can be accessed by the Lambda.
 
-Local variables must be FINAL or EFFICTIVELY FINAL in JAVA Lambda.
-	Good Explanaition https://stackoverflow.com/questions/67065119/why-dont-instance-fields-need-to-be-final-or-effectively-final-to-be-used-in-la (Kirk Woll)
-	Basic Idea, Local variables are ON STACK PER THREAD and supoosed to be Destroyed as method  finishes.
-		So Java honours this and DOES'nt allow modifiation
+Local variables must be FINAL or EFFECTIVELY FINAL in JAVA Lambda.
+	Good Explanation https://stackoverflow.com/questions/67065119/why-dont-instance-fields-need-to-be-final-or-effectively-final-to-be-used-in-la (Kirk Woll)
+	Basic Idea, Local variables are ON STACK PER THREAD and supposed to be Destroyed as method  finishes.
+		So Java honours this and DOESN'T allow modification
 
 
 Optional Class in Java 8 ?
@@ -144,7 +191,8 @@ Create FINITE stream ?
 	Arrays.stream(arr);
 	
 Create INFINITE STREAM ?
-	Stream.iterate() --> Stateful always followed by .limit(maxSize) // takeWhile(predicate) --> To break
+	Stream.iterate() --> Stateful always followed by .limit(maxSize)
+	            // takeWhile(predicate) --> To break
 	Stream.generate(supplier) --> Stateful always followed by .limit(maxSize)
 
 	

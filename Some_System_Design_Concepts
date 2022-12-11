@@ -1,0 +1,44 @@
+Qs1: System Design Interview - Distributed Message Queue
+        2 types of communications:
+            Synchronous : Impromptu request/response
+                    Example in-person, phone, VideoConference (Webex,Zoom,Slack,Teams),
+                            Coffee Break Chat, At desk chat
+            Asynchronous : Some lag is allowed
+                    Example Email, Letters or direct mail, Project management tools
+                           Text messaging, Direct messaging
+                           Video recordings (i.e., via Loom, Vidyard, CloudApp, Drift Video, etc)
+                           Asynchronous meetings, Notes and action items in a Shared stream
+
+            Basically, synchronous communications happen in real-time,
+                where asynchronous communications happen over a period of time.
+
+        Functional Requirement:
+            Core would be sendMessage()/ receiveMessage(), Need topic/queue
+            // NOT CORE
+            create/delete/purge Queue Api's
+            duplicate messages, specific ordering, Security Req
+        Non-Functional Requirement:
+             Scalability(Handle loads ,many requests and queues/topics)
+             Highly available(survive H/W , N/W failures)
+             Highly Performant (single digit latency would be allowed)
+             Durable(Once submitted , data shouldn't be lost)
+             // NOT CORE
+             SLA(Service Level Agreement) for throughput,
+             System needs to minimize Operational/Hardware Cost
+
+        https://serhatgiydiren.github.io/system-design-interview-distributed-message-queue
+        https://serhatgiydiren.github.io/
+        https://www.youtube.com/watch?v=iJLL-KPqBpM&t=188s
+
+        https://medium.com/@mayankbansal933/design-messaging-queue-515e0e912d93
+
+        https://vishalsheth4.medium.com/system-design-learning-6534e73257a2
+
+
+Qs Open Closed Principle : Mainly If-Else branches can be changed by Strategy Pattern
+        which is good way to adopt O/C principle
+
+Qs Api : It is contract/agreement b/w S/W components on how they should work together.
+   Good idea on OCP for Framework/libraries is PluralSight OCP.
+        The idea is to provide Interfaces to clients and let them write the implementation.
+

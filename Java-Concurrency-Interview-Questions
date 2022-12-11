@@ -1,0 +1,320 @@
+https://codingnconcepts.com/java-multithreading-interview-questions/
+https://www.wisdomjobs.com/e-university/java-concurrency-interview-questions.html
+
+
+Qs1: Ideal ThreadPoolSize
+        IF CPU INTENSIVE --> Ideally as many Cores.
+        int coreCount = Runtime.getRunTime().availableProcessors()
+
+        IF I/O INTENSIVE DB CALLS/NETWORK CALL/ HTTP CALL--> Then
+        Exact nbr will depend on rate of Task Submission and avg task wait time.
+
+        For CPU Bound task if u have ONLY 1 CORE , more threads will not help. Better to have one.
+
+        Ideal Thread Count - Number of Cores * [1 + (Wait Time/CPU TIME)]
+
+Qs2: Types of Pool
+        newFixedThreadPool -->  Fixed nbr of threads &&  tasks are stored in a BLOCKING Queue.
+        newCachedThreadPool --> In this task is stored in Synchronous Queue and max 1 task is stored.
+                                Once task is there , it will search the free thread else it will create new.
+                                So,it can create up to max nbr of tasks are to be submitted.
+                                If thread is idle for 60 secs, it will be killed.
+        newScheduledThreadPool --> It uses Delay Queue. Sooner running task will be at FRONT.
+                                    Used for scheduled/repeated task.
+                                    If thread is idle for 60 secs, it will be killed.
+        newSingleThreadScheduledExecutor --> Only one thread. Used Blocking Queue
+                                              Recreates the thread, if it is being killed.
+           ******* Used basically for Sequentially tasks. (bcoz only one thread)
+
+Qs3: What is RejectionHandler is ThreadPoolExecutor ?
+        If Pool cannot accept new Task bcoz TaskQueue is full and no active FREE thread,
+        it will reject the new task with RejectPolicy.
+
+        AbortPolicy -> Throws RuntimeException (RejectedExecutionException)
+        DiscardPolicy -> Silently Discard
+        DiscardOldestPolicy -> Drops existing OLDEST TASK and new will be added to the queue.
+        CallerRunsPolicy -> Feedback loop , ASK main to run the new task.
+
+Qs4: LifeCycle of ThreadPool/Threads
+        service.shutDown() --> INITIATE the SHUTDOWN. NO new task will be served
+                                and will finish all task from queue
+        service.isShutDown() --> To check whether the shutDown() is called.
+        service.isTerminated() --> TRUE , if all task including in QUEUE are done.
+        service.shutDownNow() --> INITIATE the SHUTDOWN  and RETURN list of all the QUEUED tasks
+                                  who's execution is not started.
+
+Qs4: How to return the value from task. ?
+        Use Callable Interface instead of Runnable.
+        Implement call() method.
+        get the Return Type in FUTURE<>  .get() // this is a blocking method.
+        use submit()  instead of execute().
+
+Qs5: Volatile && AtomicInteger
+        Use Volatile to Solve VISIBILITY problem (it is used in Singleton when double-checking used)
+        Use AtomicInteger to Solve Synchronization Problem
+        Detail -->
+            https://www.youtube.com/watch?v=WH5UvQJizH0&list=PLhfHPmPYPPRk6yMrcbfafFGSbE2EPK_A6&index=1
+            **** https://stackoverflow.com/questions/25425130/loop-doesnt-see-value-changed-by-other-thread-without-a-print-statement
+        Visibility Problem:
+            When one thread update any flag but other flag cannot see that.bcoz of their Local Cache.
+            So when we add Volatile ,
+                the value would be flushed to shared Cache and will be visible to other thread
+
+        Synchronization Problem:
+            When we have Compound operations on variables (value++) , and executed by multiple thread.
+            v++ is basically 2 operations (READ then ADD & WRITE)
+            To solve this use Synchronization Block  OR use ATOMIC.
+
+Qs6: Java Memory Model
+        1.Out Of Order Execution --> CPU/JVM or Compiler can change the order of instructions
+                by making sure output will not change. TO improve performance.
+
+        For example:
+                a = 3             Means LOAD a , SET 3, LOAD b,SET b, Load a , INCREMENT a , SET a
+                b = 2
+                a = a + 1
+                In this above a is being loaded twice.
+        Can be optimized like :
+                a = 3
+                a = a+1
+                b = 2
+
+        2.Field Visibility : Already explained(Qs5)
+
+        JMM is set of rules which guarantees the Field Visibility (Happens Before)
+                in case of Reordering the instructions.
+
+Qs7: What is Happens-Before contract ?
+        Any fields/variables updates before any
+            Volatile/Synchronized/Locks/Concurrent Collections/Thread Operations(join, start)
+            /Special cases in Final fields
+            will be read after volatile/ sync variables.
+
+Qs8: Parallelism vs Concurrency
+        Parallelism --> Means doing multiple things at a same time. (Needs minimum 2 Cores)
+        Concurrency --> Dealing multiple things at the same time.
+                        mainly occurs when Shared Resources is to be updated/accessed.
+                                        OR
+                        Multiple tasks needs to coordinate
+                        Tools -> Locks, Atomic Classes, Concurrent Collections/Completable Future(Java-8)/
+                                    CountDownLatch/Phaser/Cyclic barrier/Semaphore
+
+Qs9: ThreadLocal ?
+        One use case is Date Object parsing with SimpleDateFormat
+            If we use each task one SimpleDateFormat --> Not Efficient (Memory)
+            If we use One Shared SimpleDateFormat -> Not thread Safe , will throw some errors.
+            So the ideal way to create the SimpleDateFormat PER thread.
+        2nd Use Case:
+            request ->(user) Service1 ->(user) Service2-> (user) Service3
+            When one request comes and flows through multiple services and we want to log the user
+                Approach 1: Pass the user from Service - to - Service
+                Approach 2: Create any Shared Map and let each request write their user in it with their thread.
+                        This is little tricky as Map is not thread-safe
+                        So we have to use ConcurrentHashMap / Locks to access in thread-safe manner
+                Better Approach: Use ThreadLocal to store User and let is use by other services.
+        Please cleanup Once thread is complete.
+
+Qs10: DataRaces vs Race Condition
+        DataRace: when At LEAST 1 thread try to update the variable at the same time.
+        (at the same memory area).
+                    JSL mandates that it should be Atomic in case of INT , so NO MEMORY CORRUPTION
+                    DOUBLE && LONG : NO ATOMIC MANDATE --> can be Memory Corrupted. (Word-Tearing)
+                        thread 1 -> updates first 32 bit
+                        thread 2 -> updates next 32 bit  AT THE SAME TIME
+        Race Condition:
+            Pattern-1 :: Check && Update (Kind of Synchronization ISSUE) Qs5
+                Occurs when 2 threads try to use Shared Variable
+                Output of Computation depends relative ORDERING of Instructions
+                Threads are RACING to follow some instructions so RACE CONDITION
+            Solution : Use Lock/Synchronization on Atomic Instructions
+            **** This can happen in case of ConcurrentHashMaps too.
+            To solve this, this map provides putIfAbsent()
+            Ex: Check the amount then transfer. (This kind of scenario)
+
+            Pattern-2 ::  Read && Update (Kind of Synchronization ISSUE) Qs5
+                value++ (Kind of scenario)
+
+Qs11: Reentrant Lock
+        Always advisable to use lock.lock()/unlock() in try/finally.
+                Bcoz if any exception happens lock will never be released.
+        Named as Reentrant Lock , bcoz if any recursive call happens
+                        for the method which has a lock() method then it
+                            will reenter in the block to acquire again.
+        Behind the scene, getHoldCount() will just increase.
+
+        Lock Fairness --> by default, Reentrant lock is fair and serve First come first serve basis.
+                            Means the thread who waited longest will get the lock.
+        Lock Unfair.  --> U can make it Unfair by calling ReentrantLock(false).
+                            It is fast. Can lead to Thread Starvation
+        lock.tryLock() --> Only block when u have acquired lock.
+                        --> Doesn't honor the Fairness though reentrant lock is FAIR.
+
+Qs12: ReentrantReadWriteLock
+        has 2 functionality -> readLock() && writeLock()
+        Multiple ReadLock are allowed but only 1 write lock.
+        Either n ReadLock or 1 WriteLock. BOTH are NOT ALLOWED at the same time.
+
+Qs13: ForkJoinPool
+        Has concept of diving Task into sub-tasks (make it faster)
+        Per Thread queuing and Work-Stealing
+            Each thread has it's own Deque (Double Ended Queue)
+            When thread divide Task into Sub-task, these stored in Deque.
+            Suppose t1 has more sub-tasks in Deque and t2 has empty
+                it can help by stealing the t1 sub-task.
+
+Qs14: Java Interrupts
+        It's a cooperative mechanisms for indicating the STOP signal for a thread.
+        The thread which is long running can be REQUESTED POLITELY to interrupt
+                -> t1.interrupt()  from the Main Thread
+        In the Interrupted Thread -->
+            Thread.currentThread().isInterrupted()
+            Thread.interrupted() --> check the flag and reset it.
+        REQUESTED POLITELY bcoz Thread can do some clean up before stopping.
+        It throws InterruptedException to let main thread know I have stopped.
+
+        This InterruptedException is thrown in case of Obj.wait()/Thread.sleep()/Thread.join()
+
+Qs15: Semaphores (even , odd printing)
+        Basically it is used to block many nbr of threads to access or perform a slow task.
+        So semaphore helps not to burden Slow Service.
+        semaphore.acquire()/release().
+
+Qs16: Singleton Class and Double check locking ********
+        public class DraconianSingleton {
+            private static DraconianSingleton instance;
+            public static synchronized DraconianSingleton getInstance() {
+                if (instance == null) {
+                    instance = new DraconianSingleton();
+                }
+                return instance;
+            }
+
+            // private constructor and other methods ...
+        }
+        The above code creates Lazy Singleton Object. But it's slow as we are synchronizing whole method.
+        Bcoz at first call Instance is created still we have to enter in SYNC method.
+
+        To solve this : Use below code
+            public class DclSingleton {
+                private static volatile DclSingleton instance;
+                public static DclSingleton getInstance() {
+                    if (instance == null) {  // Always Check first then enter in Sync Block
+                        synchronized (DclSingleton .class) {
+                            if (instance == null) {
+                                instance = new DclSingleton();
+                            }
+                        }
+                    }
+                    return instance;
+                }
+
+                // private constructor and other methods...
+            }
+
+            *** Note we have to use volatile instance variable to AVOID Reordering of INSTRUCTIONS
+                    Qs6 (Java Memory Model)
+            *** If by any chance our Object Constructor is having (I/O, DB call or heavy calculations
+                    to fully prepared OBJECT this re-ordering of INSTRUCTIONS
+                    can lead to PARTIALLY created object.
+                To avoid this USE VOLATILE.
+
+        Alternatives :
+            1-> The best one is used currently to use ENUM. INSTANCE.
+            2-> Use Eager Initialization
+                OR USE Static INNER class to create Object ON DEMAND.
+
+Qs17:   Synchronous Queue (Qs2) (Used in newCachedThreadPool)
+        It is just like Blocking Queue with only 1 element.
+        Only 1 element (or In fact it doesn't have storage)
+            It is the best DS when we have direct handoff between threads.
+            No peek() / iterator().
+
+Qs18: Exchanger ?
+        Just like Synchronous Queue
+        Difference is Exchange will happen both sides.
+        USE CASE : Used when FULL BUFFER and EMPTY BUFFER at Producer / Consumer side.
+            After this exchange Producer will have EMPTY BUFFER
+                            and Consumer will have FULL BUFFER
+
+Qs19: CountdownLatch/ Phaser/CyclicBarrier
+        CountDown latch used when some dependent nbr of tasks
+            have to be finished before main can proceed further.
+        Start a CountdownLatch(3).
+                // Run dependent Services
+                // latch .await().
+                // Continue
+                // In services countDown the latch.countDown().
+
+        CyclicBarrier, is used for threads to reach at the barrier using await()
+               then Barrier will break and the thread will continue.
+               Then again repeat the same.
+        Phaser --> Can be used as CountdownLatch()/ CyclicBarrier and has more flexibility.
+            As a CountdownLatch --> phaser.arrive() similar to countdown()
+                                --> phaser.awaitAdvance() similar to await().
+
+            As a CyclicBarrier --> phaser.arriveAndAwaitAdvance() similar to await()
+                 Now when the Cycle will start again Phase 1 will change to Phase 2
+
+            **** It has Dynamic Registration/ De-registration of parties
+
+Qs20: SpinLocks
+        UseCase : Suppose t1 has a lock on get()/Update()/save() DB operations
+                          t2 will wait till that time.
+                          iff both threads are working on same REQUEST ID
+                          In this case if t1 runs on Core 1 and t2 on Core 2
+                            We can kick out t2 and allow t3 with different request id on Core 2
+
+                    But instead of DB operations suppose IN Memory operations has to be done
+                        Then we will not kick the t2 out rather we will allow to keep trying
+                            bcoz wait time would be very less.
+                                here we can save thread context switching headache
+
+                    This is called SPIN LOCKS
+                        --> keep trying to acquire locks without getting into wait.
+                        --> Assumptions: Most locks are being used for short period of time.
+
+                    Also Called BUSY-LOOP/WAIT or SPINNING
+
+Qs21: There is a thread running a task and we hav to timeout it after 10 secs.
+        Part A-> How do u stop a particular thread ?
+            There is no method to stop or cancel
+                So the one way is to use shutdown() / shutdownNow()/ Future.cancel() from ExecutorService
+                    However these method will not guarantee.
+        So , java threads cannot be killed. They are kind hearted, ask them politely
+        So, to ask them to stop use thread.interrupt()
+            And in thread we will use While loop to check isInterrupted()  Qs(14)
+
+                Another way is use Shared Flag keepRunning and set it false after 10 minutes
+                    to stop the thread.
+                ******** These will work if other thread is not doing any I/O.
+                        bcoz may be that call is slow and u will never be able to math the flag again.
+                ******* So mostly these request comes with TimeOut Overloaded features.
+
+        Part B-> Condition TimeOut
+                    We can ask Thread.sleep() fo 10 minutes and then use above way to ask Stop.
+                    Other way is to use SchedulerExecutorService to  run the task and timeout after 10 minutes.
+
+Qs22 : Implement Scatter-Gather Pattern
+        Approach 1 : Use CountdownLatch
+        Approach 2 : Use CompletableFuture
+        OtherApproaches : Future/Callable , WaitNotify/ Locks / Phaser (as CountdownLatch)
+        https://www.devglan.com/corejava/scatter-gather-multiple-http-requests-multithreading
+
+Qs23: Implement Producer-Consumer Pattern
+        Approach 1 : Use BlockingQueue (Easiest)
+        Approach 2 : Wait/Notify , Lock-Condition
+        OtherApproaches : ?
+
+https://wiki.sei.cmu.edu/confluence/display/java/THI03-J.+Always+invoke+wait%28%29+and+await%28%29+methods+inside+a+loop
+
+
+
+
+
+
+
+
+
+
+
+

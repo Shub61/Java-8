@@ -1,0 +1,205 @@
+Qs1: Challenges of Microservices
+        Service Discovery,Load Balancing,Fault Tolerant,
+        Distributed Tracing, Telemetries, Security,
+        Distributed transaction,
+
+
+Qs2: Service Discovery && Registration Challenges?
+        How do service locate each other ?
+        How new service instance enter into network
+        Load Balancing && Info Sharing b/w Microservices
+
+        Maintain Central Server with all the Microservice/machine
+        Register all the services to this Central
+        Keep sending HealthCheck by sending signal.(Heartbeat)
+
+        When we say client microservices --> it means backend only 1 ms wants to talk to 2nd ms
+        It's not related to UI. Fou UI -> we have API gateway to talk to backend ms.
+            Seems not correct above, Think again
+
+        Spring Cloud Supports:
+            Eureka Service Discovery Agent
+            Load Balancing for client-side.
+            Netflix Feign client for talk b/w MS
+
+Qs3: In case of Queue -> Published message will be delivered to only and only 1 receiver.
+                Topic -> Received by all Subscribers.
+
+Qs5: ServiceDiscovery
+        This occurs when MS talk to each other.
+        We call them by calling IP address which we hardcode.
+        Hardcoding is wrong, when machine changes we have to change in code.
+        In Cloud Dynamic IP is provided.
+        LoadBalancing/MultipleEnvironments
+
+        We use ServiceDiscovery Pattern
+        In this we have ONE MIDDLE DISCOVERY SERVER which has/maps all the HOSTS
+        Each services REGISTERS to this SERVER.(LIKE PHONEBOOK)
+
+        We have 2 ways of Implementation
+            1: Client Side SD : 1.Client asks the DS for address of MS
+                                2. It gets the address from DS
+                                3. It Starts talking to MS
+            2: SeverSide SD: Client asks DS to pass "HI" to MS.
+
+        Spring Cloud uses CLIENT SIDE SD with EUREKA
+
+        Working of Eureka SD
+            Steps:  1.Start a Eureka Sever
+                    2. Register all the MS to it.
+                    3.  Let MS talk to each other using EUREKA CLIENT
+
+        // Eureka Server Dependency
+         <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+        </dependency>
+        @EnableEurekaServer : is the annotation to treat class as Server
+
+        // Eureka Client Dependency
+        <dependency>
+        			<groupId>org.springframework.cloud</groupId>
+        			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        @EnableEurekaClient : is the annotation to treat class as Client
+
+        Now how to talk ?
+            @LoadBalanced --> is on the RestTemplate --> then this will discover service in LB way.
+                        No need to hardcode the URL
+
+        If any Service goes down:
+            Eureka Client also sends HEARTBEAT to server for it's Status
+            If Eureka Server goes down, we can use Cache (Just a way)
+
+
+Qs5: Resilience:
+        Challenges with Availability/Fault Tolerance
+        How much tolerant ur system is in case of any MS is down.
+        How many falls a system can tolerate.
+
+        Scenario 1 : If any Instance goes down
+                        --> Run multiple instances
+        Scenario 2 : When MS is very slow. It creates a cascade slowness.
+                        --> Use Threads (By Default Web Servers have approx 200 threads)
+                        --> So we can have 200 parallel request serving.
+                        But Suppose We have couple of threads serving the SLOW request,
+                                eventually it will again cause next request to wait bcoz threads would be busy.
+                        So OPTION 1 : have TIME OUT for
+                                But this again partial solution
+                                    as -> we don't know how much time.
+                                            Also, if the nbr of requests are coming is too many than the setTimeOut
+                                                    again the same problem will arise.
+
+Qs6 : CIRCUIT BREAKER
+    Detect the slow service
+    Don't send request to that for a bit.
+    Break the (Circuit) "Problem", to avoid cascade effect.
+
+    Decision Parameters for CB Pattern:
+    When does circuit trip ?
+        Last n requests to consider the decision.
+        How many those should fail?
+        Timeout duration
+        How long wait to get the circuit up (Sleep window)
+
+        Now When a circuit breaks WHAT kind of FALL BACK we should do?
+            1 : Throw an error (Not a good idea)
+            2 : Send back default response.
+            3 : Sometime use previous response from cache.
+
+    Status of CB:
+        Closed --> It's green -> can pass requests
+        HalfOpen--> Only allow few.
+        Open --> Not allowed
+
+
+Summary : Failing Fast, fault tolerance, Automatic recovery.
+
+        With resilience4 library we can achieve the above pattern.
+                <dependency>
+            			<groupId>io.github.resilience4j</groupId>
+            			<artifactId>resilience4j-spring-boot2</artifactId>
+            		</dependency>
+            		<dependency>
+            			<groupId>io.github.resilience4j</groupId>
+            			<artifactId>resilience4j-circuitbreaker</artifactId>
+            		</dependency>
+            		<dependency>
+            			<groupId>io.github.resilience4j</groupId>
+            			<artifactId>resilience4j-timelimiter</artifactId>
+            		</dependency>
+            		//// This is added bcoz resilience4j uses run time advises and depends on AOP
+            		<dependency>
+            			<groupId>org.springframework.boot</groupId>
+            			<artifactId>spring-boot-starter-aop</artifactId>
+            		</dependency>
+
+                @CircuitBreaker(name= "detailsForCustomerSupportApp", fallbackMethod = "someFallback")
+
+                someFallback() method must follow basic rules:
+                            Same parameter as original api.
+                            One mandatory Throwable parameter
+
+                resilience4j.circuitbreaker.configs.default.registerHealthIndicator= true
+                resilience4j.circuitbreaker.instances.detailsForCustomerSupportApp.minimumNumberOfCalls= 5
+                resilience4j.circuitbreaker.instances.detailsForCustomerSupportApp.failureRateThreshold= 50
+                resilience4j.circuitbreaker.instances.detailsForCustomerSupportApp.waitDurationInOpenState= 30000
+                resilience4j.circuitbreaker.instances.detailsForCustomerSupportApp.permittedNumberOfCallsInHalfOpenState=2
+
+                resilience4j.retry.configs.default.registerHealthIndicator= true
+                resilience4j.retry.instances.retryForCustomerDetails.maxRetryAttempts=3
+                resilience4j.retry.instances.retryForCustomerDetails.waitDuration=2000
+
+                resilience4j.ratelimiter.configs.default.registerHealthIndicator= true
+                resilience4j.ratelimiter.instances.sayHello.timeoutDuration=5000
+                resilience4j.ratelimiter.instances.sayHello.limitRefreshPeriod=5000
+                resilience4j.ratelimiter.instances.sayHello.limitForPeriod=1
+
+                With Java 8 or new : We have a service / decorate it with CB and call.
+                                     This decorator will take care of allow/deny, and etc.
+                Create a CB Config-> CircuitBreakerConfig cbConfig = CircuitBreakerConfig.custom().....many config/parameters
+                Then create a config-> CircuitBreaker cb = CircuitBreaker.ofDefaults("someservice", cbConfig)
+                //Decorate a remote call with cb
+                Supplier<String> sp = CircuitBreaker.decorateSupplier(cb, which method);
+                // Now make the call
+                Try<String> result = try.ofSupplier(sp);
+
+Qs6 : BulkHead Pattern
+        In this we will put a MAX limit of request on a Service
+        And will keep the track of incoming request for that service.
+        if it is more than max will NOT ALLOW.
+
+Qs7: Difference b/w CB && BH
+        CB is implemented on Caller side.
+        Bh is implemented on Server side.
+
+Qs8: Distributed Tracing && Log Aggregating (
+        Spring Cloud support Sleuth /Zipkin for this.
+        Sleuth Add 3 thing for each logging.
+            1. Application name
+            2: Trace ID/ Correlation Id  : Unique for Entire Transaction
+            3: Span Id : Unique for different part of Transaction.
+
+        Log Aggregating : use Zipkin
+            Idea is Push all the messages to centralized queue.
+                and later pushed to Zipkin Server then we can aggregate them.
+            Rather pushing to zipkin server, we can use Splunk
+
+        What is Architecture of Zipkin:
+            It has Collector : It collects the logs and Index them for better search
+                   Storage: Supports NoSql, MySql
+                   Zipkin Query Service: Once the data is stored & indexed ,
+                     we can query thi API to get the logs. Consumer is web ui.
+                   WebUi : Dashboard type.
+
+Qs4: Common Patterns in Microservices for Resiliency
+        CircuitBreaker
+        BulkHead
+        Retry
+        Timeout
+        RateLimiter
+
+
+Q5 : Some Databases related Architectures
+    : 2 Phase Commit, 3 Phase Commit, Saga Pattern,
+     CQRS Pattern -> Command and Query Responsibility Segregation

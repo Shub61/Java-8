@@ -1,0 +1,111 @@
+https://www.youtube.com/watch?v=Y6Ev8GIlbxc
+
+What is DS: many computer works together and looks like one.
+Main features: Work concurrently,
+                Fail independently,
+                Do not share a global clock.
+
+3 Main Topics: Storage, Computation, Messaging
+    Points on Storage:
+        1 : Simple 1 DB -> Read/Write looks gd, but when Reads are too many
+                Create Read Replica's -> We broke 1 DB to Many and create Distributed System
+                                        (Not fully) , TRADE OFF is : Consistency.
+                                            Write at One(Master) and pushed to other Read Servers.
+                                        Now as we advance more , Write will also break.
+                                                -> We do more terrible thing (Sharding) -> Divide data based on some key
+                                        TradeOff -> (Kind of broken DataModel) -> Not easy to Join Now
+                So the technique is CONSISTENT HASHING to Model ur Database for Distributed System.
+                    In this world, we can have couple of replicas.
+                    But still it is possible that while we write one node is down -so the problem
+                    The idea here is we cannot have 100% always consistent.
+                    For eventual consistency => Read + Write > Nbr of Replicas
+
+        CAP theorem : Consistent, Available, Partition Tolerant
+
+    Distributed Computation:
+        MAPREDUCE -> Count Word Example:
+                        Split -> then MAP with nbr(count) -> Shuffle (Arrange like same word near)
+                                            --> Reduce (Aggregate)
+        Spark , Now Kafka
+
+    Messaging:
+        Used for loosely coupled systems
+        Subscribers/Consumer && Publisher/Producer
+        Organized by topics/
+        Processed by brokers.
+
+        Problems with messages :
+            Too many too have one one computer
+            One computer is down
+            Kafka is way to go
+                 So u have a topic , partition it put it on different computers,
+                 Start producing the message , hash and mod/partition -> this way messages
+                            would be in ORDER within PARTITION
+                 Consumers will start consume in order.
+            Here in this , u can put events today and process them tomorrow.
+                This is LAMBDA Architecture -> 2 Parts -> 1 is BATCH -> COMPLETE but SLOW
+                                                            2 is REAL -> FAST but NOT COMPLETE
+                Down side of LAMBDA -> Write same code 2 times
+            Then came STREAM
+
+Partitioning in Distributed System:
+    We can Scalability while using more machines.
+    Vertical : In this ColumnWise break. Limitation -> When we join to get the data.
+    Horizontal(Sharding) : It's based on some keys ROWS we can split
+                                Limitation -> Searching becomes slow.
+                            Another important implication of horizontal partitioning is the
+                                potential for loss of transactional semantics.
+                            When we store data in a single machine, we can easily perform multiple operations in an atomic way,
+                                    where either all or none of them succeed.
+                                     However, this is much harder to achieve in a distributed system.
+
+    Horizontal Partitioning:
+        1-> Range Partitioning -> based on some range e divide data
+                                  Maintain that range in some node
+                                  Search query consults that Node to get the data.
+
+                                  Benefit: Easy, for small range FAST
+                                  Drawback: Slow for BIG RANGE (which includes Multiple Machines)
+                                            Also : becomes slow when one Node has HOT SPOT (Example Celebrity Name resides in that)
+
+        2-> HashPartitioning : Hash Row based on some value and take MOD with node to get the NODE to store data.
+                                  Benefit: Can calculate the hash at run time , so NO NEED TO KEEP MAP TABLE.
+                                            Better distribution of data.
+                                  Drawback: If node increase/decrease -> Hell lot of time to Migrate.
+                                            Big range Query.
+
+        3-> Consistent Hashing : Ring type allocation
+                                  Benefit : Easy when any node remove/delete
+                                  Drawback : imbalanced data distribution:
+                                        Solved BY VIRTUAL NODES
+
+Replication#
+        Replication is the main technique used in distributed systems to increase availability
+        But then this Breaks the CONSISTENCY
+        SINGLE MASTER-SLAVE
+            Synchronous :Write to Primary and get back responses from SLAVES:
+                    SLOW for WRITE but DURABILITY/CONSISTENCY
+            Async:  Write to Primary and send back response then update Slaves:
+                    Fast for WRITE but trade off are DURABILITY/CONSISTENCY
+
+        SINGLE MASTER-SLAVE : The consistency issues can occur bcoz of multiple write
+                    One approach : Conflict resolved by using LATEST TIME STAMP at Client side.
+
+        CAP theorem :  Systems may be CP or AP when network Partitions fail
+        PACELC :  In case of Normal partitions : system has to choose b/w Latency & Consistency
+
+Isolation level Anamolies:
+    Dirty Write/ Read
+    Phantom Read : means b/w 2 reads (predicate based) one writes some data : it can lead issues.
+    Lost Update
+    Read/Write Skew
+
+
+Introduction to Distributed Transactions
+
+
+
+
+[,],<,>,{,},(,)
+(())<[]>({})
+(())<[>]({})

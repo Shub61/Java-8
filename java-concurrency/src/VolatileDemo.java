@@ -1,7 +1,5 @@
-import java.util.concurrent.atomic.AtomicBoolean;
-
-public class VolatileAtomicDemo extends Thread{
-    boolean flag = true;
+public class VolatileDemo extends Thread{
+    volatile boolean flag = true;
     @Override
     public void run() {
         while (flag){
@@ -9,10 +7,10 @@ public class VolatileAtomicDemo extends Thread{
         }
     }
     public static void main(String[] args) throws InterruptedException {
-        VolatileAtomicDemo volatileAtomicDemo = new VolatileAtomicDemo();
-        volatileAtomicDemo.start();
+        VolatileDemo volatileDemo = new VolatileDemo();
+        volatileDemo.start();
         Thread.sleep(1000);
-        volatileAtomicDemo.flag = false;
+        volatileDemo.flag = false;
         System.out.println(Thread.currentThread().getName() + ":: Main Task");
     }
 }

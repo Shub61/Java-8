@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Java-8.iml" filepath="$PROJECT_DIR$/.idea/Java-8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Java-collections/Java-collections.iml" filepath="$PROJECT_DIR$/Java-collections/Java-collections.iml" />
+      <module fileurl="file://$PROJECT_DIR$/functional_interface/functional_interface.iml" filepath="$PROJECT_DIR$/functional_interface/functional_interface.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-8-coding-interview-questions/java-8-coding-interview-questions.iml" filepath="$PROJECT_DIR$/java-8-coding-interview-questions/java-8-coding-interview-questions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-concurrency/java-concurrency.iml" filepath="$PROJECT_DIR$/java-concurrency/java-concurrency.iml" />
+      <module fileurl="file://$PROJECT_DIR$/some-common/some-common.iml" filepath="$PROJECT_DIR$/some-common/some-common.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,135 @@
+Qs1: @RestController(Spring 4.0) is replacement of @Controller + @ResponseBody
+
+Qs2: @RequestParam vs @QueryParam vs @PathVariable vs @PathParam
+        @PathParam && @QueryParam :: Group as INPUT provided from URL
+        Example:
+            http://www.xyz.ir/ <@PathParam> /? queryParamName = <@QueryParm>
+        @PathParam reads the value from a path part of the called URI. (Ordering is imp)
+        @QueryParam is used to read the values from QueryParameters of a URI call.
+            These are after? listed in a URI. (passed as Key value, Not dependent of Order)
+
+        @RequestParam &&  @PathVariable :: Group as INPUT received at the Java CODE
+        @PathVariable extract values from the URI path:
+            @RequestMapping(value = "/orders/{id}", method = RequestMethod.GET)
+            @ResponseBody
+            public String getOrder(@PathVariable final String id) {
+              return "Order ID: " + id;
+            }
+
+        @RequestParams extract values from the query string, /?id = 1
+
+Qs3: @PostConstruct
+        It runs just after the constructor.
+            MUST have the syntax
+                void <METHOD> () --> NO PARAM
+            Can throw checked exception
+        The method MUST NOT have any parameters except in the case of interceptors
+            in which case it takes an InvocationContext object as defined by the Interceptors specification.
+        In the case of interceptors
+            void <METHOD>(InvocationContext)
+            Object <METHOD>(InvocationContext) throws Exception
+        Only 1 method is allowed to have @PostConstruct
+
+@Qs4: How many ways to load some values on StartUp
+        1.@PostConstruct
+        2.The InitializingBean Interface with afterPropertiesSet()
+        3.An ApplicationListener or @EventListener with onApplicationEvent()
+
+        4.The @Bean initMethod Attribute
+                +
+        @Bean(initMethod="init")
+        public InitMethodExampleBean initMethodExampleBean() {
+            return new InitMethodExampleBean();
+        }
+
+        5.Constructor Injection
+        6.Spring Boot CommandLineRunner with a run()
+        7.ApplicationRunner interface with a run()
+
+        Note : Order of execution of above
+            constructor
+            @PostConstruct annotated methods
+            InitializingBean's afterPropertiesSet() method
+            initialization method specified as init-method in XML
+
+Qs5: HTTP Methods
+        Resources Retrievals methods:
+            GET && HEAD (only gives Headers)
+        Resources Modifications methods:
+            POST-> to add passed value to targeted resource
+                -> POST means "create new" as in "Here is the input for creating a user, create it for me".
+                -> You POST to example.com/users since you don't know the URL of the user yet,
+                    you want the server to create it.
+            PUT --> To place/replace resource with the passed on
+                --> PUT means "insert, replace if already exists" as in "Here is the data for user 5".
+                -->You PUT to example.com/users/id since you want to replace/create a specific user.
+
+            POSTing twice with the same data means create two identical users with different ids.
+            PUTing twice with the same data creates the user the first and updates him to the same state the second time
+            (no changes).
+            Since you end up with the same state after a PUT no matter how many times you perform it,
+            it is said to be "equally potent" every time - idempotent.
+            This is useful for automatically retrying requests.
+            No more 'are you sure you want to resend' when you push the back button on the browser.
+
+            PATCH -> To modify resource
+            DELETE -> delete the targeted resource
+            OPTIONS -> ?
+        Resource Environment Methods:
+            TRACE -> This test allows one to take a look at the path to the targeted resource
+            CONNECT -> establishes a tunnel to the server which holds the targeted resource.
+
+            In PUT though we want to update only couple of params, still full paylod has to be sent.
+                AND it will do the REPLACE for whole resource.
+            In PATCH only the changed param can be passed.
+
+        https://www.mscharhag.com/api-design/rest-partial-updates-patch
+
+Qs6: RestTemplate common methods: From Spring 5.0 this is depreciated by WebClient
+        restTemplate.getForEntity() -> Get the full Response, can convert Body to Json and process
+                     .getForObject() --> get the POJO
+        restTemplate.headForHeaders() -> get the headers
+
+        restTemplate.postForEntity()/postForObject() -> returns the Resource itself
+                    .postForLocation() --> return the URI(Location)
+        restTemplate.delete()
+        ***restTemplate.exchange() --> Generic for PUT/POST
+
+
+Some Error/Success Codes
+
+    204 (No Content) - Indicates that the operation has been completed successfully
+            and no data is returned
+    200 (Ok) - The operation has been completed successfully
+            and the response body contains more information (for example the updated resource).
+    400 (Bad request) - The request body is malformed and cannot be processed.
+    409 (Conflict) - The request is syntactically valid but
+        cannot be applied to the resource. For example it can be used with JSON Patch
+        if the element selected by a JSON pointer (the path field) does not exist.
+
+
+
+
+****************
+The client (or API consumer) is the app, which sends a message (i.e. an HTTP request)
+to the API whenever it needs something.
+The server then replies with the response,
+including a status code that indicates if the request was processed successfully (2xx error code),
+failed due to client error (4xx error code), or failed due to server error (5xx error code).
+All communication flows from the consumer to the API backend.
+
+
+Qs : Different Scopes of Spring/Boot Beans
+        Singleton (Per object with one IOC/Application Context) , Prototype
+
+     Imp Point/Qs : If Bean is Singleton and it has dependency which is Prototype
+        Then ideally by getting Singleton Bean twice I should get 2 different of prototype:
+                But That does Not happen
+        To solve this --> use proxyMode = ScopedProxyMode.TargetClass
+
+        Request Scope: This bean will initialize when and only when we get new request to controller.
+            The App will not start if we declare Request on BootUp
+            To solve : use again proxyMode = ScopedProxyMode.TargetClass
+
+
+        Session Scope : Only one bean for one HTTP session

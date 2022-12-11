@@ -9,5 +9,6 @@ public class LambdaExpressionDemo {
     public static void main(String[] args) {
         LambdaExpression lambdaExpression = (s) -> s.length();
         System.out.println(lambdaExpression.getLength("Shubham"));
+
     }
 }
